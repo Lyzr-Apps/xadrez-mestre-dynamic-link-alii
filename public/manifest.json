@@ -1,0 +1,26 @@
+{
+  "name": "ChessMaster AI",
+  "short_name": "ChessMaster",
+  "description": "Assistente inteligente de xadrez com analise, treinamento de aberturas e puzzles taticos",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/lyzr.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lyzr.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "education"],
+  "lang": "pt-BR"
+}

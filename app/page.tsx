@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { callAIAgent } from '@/lib/aiAgent'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { GiChessKnight, GiChessKing } from 'react-icons/gi'
-import { FiBook, FiTarget, FiSearch, FiChevronLeft, FiRefreshCw, FiChevronRight, FiChevronDown, FiChevronUp } from 'react-icons/fi'
+import { FiBook, FiTarget, FiSearch, FiChevronLeft, FiRefreshCw, FiChevronRight, FiChevronDown, FiChevronUp, FiMenu, FiX, FiDownload, FiSmartphone } from 'react-icons/fi'
 import { HiOutlineLightBulb } from 'react-icons/hi'
 import { BiAnalyse } from 'react-icons/bi'
 
@@ -255,41 +255,45 @@ function renderMarkdown(text: string) {
 
 function ChessBoard({ fen, size = 'normal' }: { fen: string; size?: 'normal' | 'small' }) {
   const board = parseFEN(fen)
-  const squareSize = size === 'small' ? 'w-8 h-8 text-lg' : 'w-10 h-10 text-2xl sm:w-12 sm:h-12 sm:text-3xl'
+  const squareSize = size === 'small' ? 'w-8 h-8 text-lg' : 'w-8 h-8 text-xl sm:w-10 sm:h-10 sm:text-2xl md:w-10 md:h-10 md:text-2xl lg:w-12 lg:h-12 lg:text-3xl'
+  const rankHeight = size === 'small' ? 'h-8' : 'h-8 sm:h-10 md:h-10 lg:h-12'
+  const fileWidth = size === 'small' ? 'w-8' : 'w-8 sm:w-10 md:w-10 lg:w-12'
 
   return (
-    <div className="inline-block border border-border">
-      <div className="flex">
-        <div className="flex flex-col justify-around pr-1">
-          {RANKS.map(r => (
-            <span key={r} className="text-xs text-muted-foreground flex items-center justify-center w-4 h-10 sm:h-12">{r}</span>
-          ))}
-        </div>
-        <div>
-          {board.map((row, rowIdx) => (
-            <div key={rowIdx} className="flex">
-              {row.map((piece, colIdx) => {
-                const isLight = (rowIdx + colIdx) % 2 === 0
-                return (
-                  <div
-                    key={colIdx}
-                    className={`${squareSize} flex items-center justify-center select-none ${isLight ? 'bg-[hsl(0_0%_25%)]' : 'bg-[hsl(0_0%_15%)]'}`}
-                  >
-                    {piece && PIECES[piece] ? (
-                      <span className={piece === piece.toUpperCase() ? 'text-[hsl(0_0%_90%)]' : 'text-[hsl(0_70%_55%)]'}>
-                        {PIECES[piece]}
-                      </span>
-                    ) : null}
-                  </div>
-                )
-              })}
-            </div>
-          ))}
-          <div className="flex">
-            <div className="w-0" />
-            {FILES.map(f => (
-              <div key={f} className={`${size === 'small' ? 'w-8' : 'w-10 sm:w-12'} text-center text-xs text-muted-foreground pt-1`}>{f}</div>
+    <div className="overflow-x-auto">
+      <div className="inline-block border border-border">
+        <div className="flex">
+          <div className="flex flex-col justify-around pr-1">
+            {RANKS.map(r => (
+              <span key={r} className={`text-xs text-muted-foreground flex items-center justify-center w-4 ${rankHeight}`}>{r}</span>
             ))}
+          </div>
+          <div>
+            {board.map((row, rowIdx) => (
+              <div key={rowIdx} className="flex">
+                {row.map((piece, colIdx) => {
+                  const isLight = (rowIdx + colIdx) % 2 === 0
+                  return (
+                    <div
+                      key={colIdx}
+                      className={`${squareSize} flex items-center justify-center select-none ${isLight ? 'bg-[hsl(0_0%_25%)]' : 'bg-[hsl(0_0%_15%)]'}`}
+                    >
+                      {piece && PIECES[piece] ? (
+                        <span className={piece === piece.toUpperCase() ? 'text-[hsl(0_0%_90%)]' : 'text-[hsl(0_70%_55%)]'}>
+                          {PIECES[piece]}
+                        </span>
+                      ) : null}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+            <div className="flex">
+              <div className="w-0" />
+              {FILES.map(f => (
+                <div key={f} className={`${fileWidth} text-center text-xs text-muted-foreground pt-1`}>{f}</div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -380,7 +384,7 @@ class ErrorBoundary extends React.Component<
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
 
-function Sidebar({ active, onNavigate }: { active: Section; onNavigate: (s: Section) => void }) {
+function Sidebar({ active, onNavigate, isOpen, onClose }: { active: Section; onNavigate: (s: Section) => void; isOpen: boolean; onClose: () => void }) {
   const items: { key: Section; label: string; icon: React.ReactNode }[] = [
     { key: 'jogar', label: 'Jogar', icon: <GiChessKing className="w-5 h-5" /> },
     { key: 'aberturas', label: 'Aberturas', icon: <FiBook className="w-5 h-5" /> },
@@ -388,43 +392,118 @@ function Sidebar({ active, onNavigate }: { active: Section; onNavigate: (s: Sect
     { key: 'revisao', label: 'Revisao', icon: <FiSearch className="w-5 h-5" /> },
   ]
 
+  const handleNavClick = (key: Section) => {
+    onNavigate(key)
+    onClose()
+  }
+
   return (
-    <div className="w-56 min-h-screen bg-[hsl(0_0%_7%)] border-r border-border flex flex-col fixed left-0 top-0 z-40">
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <GiChessKnight className="w-7 h-7 text-[hsl(0_70%_55%)]" />
-          <h1 className="text-lg font-bold tracking-tight">ChessMaster AI</h1>
-        </div>
-      </div>
-      <nav className="flex-1 p-4 space-y-1">
-        {items.map(item => (
+    <>
+      {/* Mobile backdrop overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar panel */}
+      <div
+        className={`w-56 min-h-screen bg-[hsl(0_0%_7%)] border-r border-border flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <GiChessKnight className="w-7 h-7 text-[hsl(0_70%_55%)]" />
+            <h1 className="text-lg font-bold tracking-tight">ChessMaster AI</h1>
+          </div>
+          {/* Close button - only visible on mobile */}
           <button
-            key={item.key}
-            onClick={() => onNavigate(item.key)}
-            className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${active === item.key ? 'bg-[hsl(0_0%_12%)] text-[hsl(0_70%_55%)] border-l-2 border-[hsl(0_70%_55%)]' : 'text-muted-foreground hover:text-foreground hover:bg-[hsl(0_0%_10%)]'}`}
+            onClick={onClose}
+            className="md:hidden p-1 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Fechar menu"
           >
-            {item.icon}
-            {item.label}
+            <FiX className="w-5 h-5" />
           </button>
-        ))}
-      </nav>
-      <div className="p-4 border-t border-border">
-        <div className="text-xs text-muted-foreground space-y-2">
-          <p className="font-medium text-foreground mb-2">Agentes Ativos</p>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500" />
-            <span>Analise</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500" />
-            <span>Aberturas</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-green-500" />
-            <span>Taticas</span>
+        </div>
+        <nav className="flex-1 p-4 space-y-1">
+          {items.map(item => (
+            <button
+              key={item.key}
+              onClick={() => handleNavClick(item.key)}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${active === item.key ? 'bg-[hsl(0_0%_12%)] text-[hsl(0_70%_55%)] border-l-2 border-[hsl(0_70%_55%)]' : 'text-muted-foreground hover:text-foreground hover:bg-[hsl(0_0%_10%)]'}`}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t border-border">
+          <div className="text-xs text-muted-foreground space-y-2">
+            <p className="font-medium text-foreground mb-2">Agentes Ativos</p>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500" />
+              <span>Analise</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500" />
+              <span>Aberturas</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500" />
+              <span>Taticas</span>
+            </div>
           </div>
         </div>
       </div>
+    </>
+  )
+}
+
+// ─── PWA Install Banner ─────────────────────────────────────────────────────
+
+function PWAInstallBanner({ installPrompt, onInstall, onDismiss }: { installPrompt: any; onInstall: () => void; onDismiss: () => void }) {
+  if (!installPrompt) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 md:ml-56">
+      <Card className="bg-card border-border shadow-2xl max-w-lg mx-auto">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 w-10 h-10 bg-[hsl(0_70%_55%)]/10 border border-[hsl(0_70%_55%)]/30 flex items-center justify-center">
+              <FiSmartphone className="w-5 h-5 text-[hsl(0_70%_55%)]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold mb-1">Instale o ChessMaster AI no seu dispositivo</p>
+              <p className="text-xs text-muted-foreground">Acesse rapidamente direto da tela inicial, mesmo offline.</p>
+            </div>
+            <button
+              onClick={onDismiss}
+              className="shrink-0 p-1 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Fechar"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="flex items-center gap-2 mt-3">
+            <Button
+              onClick={onInstall}
+              size="sm"
+              className="flex-1 bg-[hsl(0_70%_55%)] hover:bg-[hsl(0_70%_45%)] text-white gap-2"
+            >
+              <FiDownload className="w-4 h-4" />
+              Instalar App
+            </Button>
+            <Button
+              onClick={onDismiss}
+              variant="outline"
+              size="sm"
+              className="shrink-0"
+            >
+              Agora nao
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
@@ -494,7 +573,7 @@ function JogarSection({ showSample }: { showSample: boolean }) {
   }
 
   return (
-    <div className="flex gap-6 h-full">
+    <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Left column - Board */}
       <div className="flex-[3] space-y-4">
         <div className="flex items-center gap-4 flex-wrap">
@@ -806,7 +885,7 @@ function AberturasSection({ showSample }: { showSample: boolean }) {
           <h2 className="text-2xl font-bold tracking-tight mb-1">Catalogo de Aberturas</h2>
           <p className="text-sm text-muted-foreground">Escolha uma abertura para iniciar o treinamento interativo</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {OPENINGS_CATALOG.map((op, i) => (
             <Card key={i} className="bg-card border-border hover:border-[hsl(0_70%_55%)] transition-colors">
               <CardHeader className="pb-2">
@@ -836,7 +915,7 @@ function AberturasSection({ showSample }: { showSample: boolean }) {
   }
 
   return (
-    <div className="flex gap-6 h-full">
+    <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Left - Board */}
       <div className="flex-[3] space-y-4">
         <Button
@@ -905,13 +984,13 @@ function AberturasSection({ showSample }: { showSample: boolean }) {
         <ScrollArea className="h-[300px]">
           <div className="space-y-3 pr-4">
             {chatHistory.map((msg, i) => (
-              <div key={i} className={`p-3 text-sm ${msg.role === 'user' ? 'bg-secondary border border-border ml-8' : 'bg-card border border-border mr-4'}`}>
+              <div key={i} className={`p-3 text-sm ${msg.role === 'user' ? 'bg-secondary border border-border ml-4 sm:ml-8' : 'bg-card border border-border mr-2 sm:mr-4'}`}>
                 <p className="text-xs text-muted-foreground mb-1">{msg.role === 'user' ? 'Voce' : 'Treinador'}</p>
                 {renderMarkdown(msg.content)}
               </div>
             ))}
             {loading && (
-              <div className="p-3 bg-card border border-border mr-4 text-sm flex items-center gap-2 text-muted-foreground">
+              <div className="p-3 bg-card border border-border mr-2 sm:mr-4 text-sm flex items-center gap-2 text-muted-foreground">
                 <FiRefreshCw className="w-3 h-3 animate-spin" />
                 Analisando...
               </div>
@@ -1110,11 +1189,11 @@ function PuzzlesSection({ showSample }: { showSample: boolean }) {
   }
 
   return (
-    <div className="flex gap-6 h-full">
+    <div className="flex flex-col lg:flex-row gap-6 h-full">
       {/* Left - Board */}
       <div className="flex-[3] space-y-4">
         {displayPuzzle && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <Badge className="bg-[hsl(0_70%_55%)] text-white">{displayPuzzle.tactical_theme}</Badge>
             <Badge variant="secondary">{difficultyLabel(displayPuzzle.difficulty)}</Badge>
             <Badge variant="outline">
@@ -1140,11 +1219,11 @@ function PuzzlesSection({ showSample }: { showSample: boolean }) {
             className="bg-secondary border-border"
           />
           <Button onClick={submitAnswer} disabled={loading || !answerInput.trim()} className="bg-[hsl(0_70%_55%)] hover:bg-[hsl(0_70%_45%)] text-white shrink-0">
-            Enviar Resposta
+            Enviar
           </Button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" onClick={revealHint} disabled={!displayPuzzle || hintsRevealed >= (displayPuzzle?.hints?.length ?? 0)} className="gap-2">
             <HiOutlineLightBulb className="w-4 h-4" />
             Dica
@@ -1159,7 +1238,7 @@ function PuzzlesSection({ showSample }: { showSample: boolean }) {
         </div>
 
         {/* Stats Bar */}
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-4 sm:gap-6 text-sm flex-wrap">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Sequencia:</span>
             <span className="font-bold text-[hsl(0_70%_55%)]">{puzzleStats.streak}</span>
@@ -1408,7 +1487,7 @@ function RevisaoSection({ showSample }: { showSample: boolean }) {
 
       {/* Results */}
       {displayReview && classifications.length > 0 && (
-        <div className="flex gap-6">
+        <div className="flex flex-col lg:flex-row gap-6">
           {/* Move List */}
           <div className="flex-[3]">
             <Card className="bg-card border-border">
@@ -1422,13 +1501,13 @@ function RevisaoSection({ showSample }: { showSample: boolean }) {
                       <button
                         key={i}
                         onClick={() => setSelectedMoveIndex(i)}
-                        className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left transition-colors ${selectedMoveIndex === i ? 'bg-secondary border border-[hsl(0_70%_55%)]' : 'hover:bg-secondary border border-transparent'}`}
+                        className={`w-full flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 text-sm text-left transition-colors ${selectedMoveIndex === i ? 'bg-secondary border border-[hsl(0_70%_55%)]' : 'hover:bg-secondary border border-transparent'}`}
                       >
-                        <span className="font-mono w-20 shrink-0 text-muted-foreground">{mc.move_number ?? ''}</span>
+                        <span className="font-mono w-14 sm:w-20 shrink-0 text-muted-foreground text-xs sm:text-sm">{mc.move_number ?? ''}</span>
                         <Badge className={`text-xs shrink-0 ${classificationColor(mc.classification ?? '')}`}>
                           {classificationSymbol(mc.classification ?? '')} {classificationLabel(mc.classification ?? '')}
                         </Badge>
-                        <span className="text-xs text-muted-foreground truncate">{mc.comment ?? ''}</span>
+                        <span className="text-xs text-muted-foreground truncate hidden sm:inline">{mc.comment ?? ''}</span>
                       </button>
                     ))}
                   </div>
@@ -1568,6 +1647,44 @@ function RevisaoSection({ showSample }: { showSample: boolean }) {
 export default function Page() {
   const [activeSection, setActiveSection] = useState<Section>('jogar')
   const [showSample, setShowSample] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
+
+  // PWA install prompt listener
+  useEffect(() => {
+    const dismissed = localStorage.getItem('pwa-install-dismissed')
+    if (dismissed === 'true') return
+
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstallBanner(true)
+    }
+
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    try {
+      await (installPrompt as any).prompt()
+      const result = await (installPrompt as any).userChoice
+      if (result?.outcome === 'accepted') {
+        setShowInstallBanner(false)
+        setInstallPrompt(null)
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  const handleDismissInstall = () => {
+    setShowInstallBanner(false)
+    setInstallPrompt(null)
+    localStorage.setItem('pwa-install-dismissed', 'true')
+  }
 
   const sectionTitles: Record<Section, string> = {
     jogar: 'Jogar',
@@ -1579,16 +1696,29 @@ export default function Page() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background text-foreground">
-        <Sidebar active={activeSection} onNavigate={setActiveSection} />
+        <Sidebar
+          active={activeSection}
+          onNavigate={setActiveSection}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <main className="ml-56 min-h-screen">
+        <main className="ml-0 md:ml-56 min-h-screen">
           {/* Header */}
-          <div className="border-b border-border px-8 py-4 flex items-center justify-between sticky top-0 bg-background z-30">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight">{sectionTitles[activeSection]}</h2>
-            </div>
+          <div className="border-b border-border px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 bg-background z-30">
             <div className="flex items-center gap-3">
-              <Label htmlFor="sample-toggle" className="text-xs text-muted-foreground">Sample Data</Label>
+              {/* Hamburger menu - mobile only */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors -ml-2"
+                aria-label="Abrir menu"
+              >
+                <FiMenu className="w-5 h-5" />
+              </button>
+              <h2 className="text-lg sm:text-xl font-bold tracking-tight">{sectionTitles[activeSection]}</h2>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Label htmlFor="sample-toggle" className="text-xs text-muted-foreground hidden sm:inline">Sample Data</Label>
               <Switch
                 id="sample-toggle"
                 checked={showSample}
@@ -1598,13 +1728,22 @@ export default function Page() {
           </div>
 
           {/* Content */}
-          <div className="p-8">
+          <div className="p-4 sm:p-6 lg:p-8">
             {activeSection === 'jogar' && <JogarSection showSample={showSample} />}
             {activeSection === 'aberturas' && <AberturasSection showSample={showSample} />}
             {activeSection === 'puzzles' && <PuzzlesSection showSample={showSample} />}
             {activeSection === 'revisao' && <RevisaoSection showSample={showSample} />}
           </div>
         </main>
+
+        {/* PWA Install Banner */}
+        {showInstallBanner && (
+          <PWAInstallBanner
+            installPrompt={installPrompt}
+            onInstall={handleInstall}
+            onDismiss={handleDismissInstall}
+          />
+        )}
       </div>
     </ErrorBoundary>
   )

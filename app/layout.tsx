@@ -9,10 +9,27 @@ import { AgentInterceptorProvider } from '@/components/AgentInterceptorProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Next.js App',
-  description: 'Built with Next.js, React, and Tailwind CSS',
+  title: 'ChessMaster AI',
+  description: 'Assistente inteligente de xadrez - Analise, aberturas, puzzles taticos e revisao de partidas',
   icons: {
     icon: '/lyzr.png',
+    apple: '/lyzr.png',
+  },
+  manifest: '/manifest.json',
+  themeColor: '#0f0f0f',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'ChessMaster AI',
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  other: {
+    'mobile-web-app-capable': 'yes',
   },
 }
 
