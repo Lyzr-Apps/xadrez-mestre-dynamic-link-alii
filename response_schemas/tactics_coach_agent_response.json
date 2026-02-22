@@ -1,0 +1,44 @@
+{
+  "agent_name": "Tactics Coach Agent",
+  "agent_id": "699a5377c0717306350423f0",
+  "description": "Presents tactical puzzles (forks, pins, skewers, sacrifices, checkmates), guides the user with progressive hints if wrong, explains the complete solution and tactical patterns involved, adjusts difficulty based on performance",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "puzzle_fen": "string",
+    "side_to_move": "string",
+    "difficulty": "string",
+    "tactical_theme": "string",
+    "puzzle_prompt": "string",
+    "solution": [
+      "string"
+    ],
+    "solution_explanation": "string",
+    "hints": [
+      "string"
+    ],
+    "user_answer_feedback": "string",
+    "is_correct": "boolean",
+    "pattern_lesson": "string",
+    "next_action": "string"
+  },
+  "example_response": {
+    "puzzle_fen": "FEN position of the tactical puzzle",
+    "side_to_move": "Which side moves: white or black",
+    "difficulty": "Puzzle difficulty: beginner, intermediate, advanced, or master",
+    "tactical_theme": "The tactical theme of the puzzle",
+    "puzzle_prompt": "The challenge prompt presented to the user",
+    "solution": [
+      "sample string"
+    ],
+    "solution_explanation": "Detailed explanation of the tactical pattern and solution",
+    "hints": [
+      "sample string"
+    ],
+    "user_answer_feedback": "Feedback on the user's attempted answer",
+    "is_correct": false,
+    "pattern_lesson": "Educational lesson about the tactical pattern for learning",
+    "next_action": "What to do next: new_puzzle, retry, or show_solution"
+  }
+}

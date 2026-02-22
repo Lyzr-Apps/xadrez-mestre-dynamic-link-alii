@@ -1,0 +1,62 @@
+{
+  "agent_name": "Chess Analysis Agent",
+  "agent_id": "699a5377e09fdeca7d4926a6",
+  "description": "Receives chess positions (FEN) or games (PGN) and provides deep analysis: evaluates each move, explains strategic and positional concepts, identifies errors, suggests best alternatives with detailed reasoning explanation",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "analysis_type": "string",
+    "position_evaluation": "string",
+    "best_moves": [
+      {
+        "move": "string",
+        "evaluation": "string",
+        "explanation": "string"
+      }
+    ],
+    "strategic_themes": [
+      "string"
+    ],
+    "move_classifications": [
+      {
+        "move_number": "string",
+        "classification": "string",
+        "comment": "string",
+        "best_alternative": "string"
+      }
+    ],
+    "summary": "string",
+    "material_balance": "string",
+    "key_weaknesses": [
+      "string"
+    ]
+  },
+  "example_response": {
+    "analysis_type": "Type of analysis: fen_analysis or pgn_analysis",
+    "position_evaluation": "Numerical evaluation of the position (e.g., +1.2, -0.5, 0.0)",
+    "best_moves": [
+      {
+        "move": "The move in algebraic notation",
+        "evaluation": "Position evaluation after this move",
+        "explanation": "Detailed explanation of why this move is good"
+      }
+    ],
+    "strategic_themes": [
+      "sample string"
+    ],
+    "move_classifications": [
+      {
+        "move_number": "Move number and notation",
+        "classification": "excellent, good, inaccuracy, mistake, or blunder",
+        "comment": "Explanation of the classification",
+        "best_alternative": "The best move if this was not optimal"
+      }
+    ],
+    "summary": "Overall summary of the analysis with key lessons",
+    "material_balance": "Current material balance description",
+    "key_weaknesses": [
+      "sample string"
+    ]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "agents": {
+    "chess_analysis_agent": {
+      "agent_id": "699a5377e09fdeca7d4926a6",
+      "name": "Chess Analysis Agent",
+      "node_id": "chess_analysis_agent",
+      "type": "text",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.3,
+      "top_p": 1
+    },
+    "opening_trainer_agent": {
+      "agent_id": "699a5377c0717306350423ee",
+      "name": "Opening Trainer Agent",
+      "node_id": "opening_trainer_agent",
+      "type": "text",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.4,
+      "top_p": 0.95
+    },
+    "tactics_coach_agent": {
+      "agent_id": "699a5377c0717306350423f0",
+      "name": "Tactics Coach Agent",
+      "node_id": "tactics_coach_agent",
+      "type": "text",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.4,
+      "top_p": 0.95
+    }
+  },
+  "rag_ids": {},
+  "schedule_ids": {}
+}

@@ -1,0 +1,58 @@
+{
+  "agent_name": "Opening Trainer Agent",
+  "agent_id": "699a5377c0717306350423ee",
+  "description": "Conducts interactive training of specific openings (Sicilian, Ruy Lopez, etc.), presents main lines and variants, explains the strategic plans of each opening, corrects user deviations and teaches the ideas behind the moves",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "opening_name": "string",
+    "eco_code": "string",
+    "current_position_fen": "string",
+    "current_move": "string",
+    "move_explanation": "string",
+    "main_line": [
+      "string"
+    ],
+    "key_variations": [
+      {
+        "variation_name": "string",
+        "moves": "string",
+        "explanation": "string"
+      }
+    ],
+    "strategic_plans": [
+      "string"
+    ],
+    "typical_mistakes": [
+      "string"
+    ],
+    "next_prompt": "string",
+    "user_move_feedback": "string"
+  },
+  "example_response": {
+    "opening_name": "Name of the opening being trained",
+    "eco_code": "ECO classification code",
+    "current_position_fen": "FEN of the current position in the training",
+    "current_move": "The current move being discussed",
+    "move_explanation": "Detailed explanation of why this move is played",
+    "main_line": [
+      "sample string"
+    ],
+    "key_variations": [
+      {
+        "variation_name": "Name of this variation",
+        "moves": "The variation moves in algebraic notation",
+        "explanation": "Brief explanation of this variation's ideas"
+      }
+    ],
+    "strategic_plans": [
+      "sample string"
+    ],
+    "typical_mistakes": [
+      "sample string"
+    ],
+    "next_prompt": "Question or prompt for the user to continue the training",
+    "user_move_feedback": "Feedback on the user's move if they deviated from theory"
+  }
+}

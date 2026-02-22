@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "input_node",
+      "type": "Input",
+      "label": "User Input",
+      "nodeCategory": "input"
+    },
+    {
+      "id": "chess_analysis_agent",
+      "type": "Agent",
+      "label": "Chess Analysis Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "opening_trainer_agent",
+      "type": "Agent",
+      "label": "Opening Trainer Agent",
+      "nodeCategory": "agent"
+    },
+    {
+      "id": "tactics_coach_agent",
+      "type": "Agent",
+      "label": "Tactics Coach Agent",
+      "nodeCategory": "agent"
+    }
+  ],
+  "edges": [
+    {
+      "source": "input_node",
+      "target": "chess_analysis_agent"
+    },
+    {
+      "source": "input_node",
+      "target": "opening_trainer_agent"
+    },
+    {
+      "source": "input_node",
+      "target": "tactics_coach_agent"
+    }
+  ],
+  "agents": [
+    {
+      "node_id": "chess_analysis_agent",
+      "agent_id": "699a5377e09fdeca7d4926a6",
+      "name": "Chess Analysis Agent",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.3,
+      "top_p": 1
+    },
+    {
+      "node_id": "opening_trainer_agent",
+      "agent_id": "699a5377c0717306350423ee",
+      "name": "Opening Trainer Agent",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.4,
+      "top_p": 0.95
+    },
+    {
+      "node_id": "tactics_coach_agent",
+      "agent_id": "699a5377c0717306350423f0",
+      "name": "Tactics Coach Agent",
+      "model": "gpt-4.1",
+      "provider": "openai",
+      "temperature": 0.4,
+      "top_p": 0.95
+    }
+  ]
+}
